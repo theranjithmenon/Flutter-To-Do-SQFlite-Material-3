@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/main_nav.dart';
 
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }

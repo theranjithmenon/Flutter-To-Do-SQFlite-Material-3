@@ -10,9 +10,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-
   int currentIndex = 0;
-  List pages = const [PendingTasks(), CheckedTasks()];
+  List pages = [PendingTasks(), CheckedTasks()];
 
   @override
   Widget build(BuildContext context) {
@@ -45,23 +44,26 @@ class _MainPageState extends State<MainPage> {
   }
 
   _addTask() {
+    TextEditingController taskName = TextEditingController();
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          icon: Icon(Icons.add_task),
-          title: Text("Add Task"),
-          content: TextField(
-            decoration: InputDecoration(
-              hintText: "Name of task",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))
-            ),
-          ),
-          actions: [
-            MaterialButton(
-              onPressed: () {},
-              child: Text("Add"),
-            )
-          ],
-        ));
+              icon: Icon(Icons.add_task),
+              title: Text("Add Task"),
+              content: TextField(
+                controller: taskName,
+                decoration: InputDecoration(
+                    hintText: "Name of task",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10))),
+              ),
+              actions: [
+                MaterialButton(
+                  onPressed: () {
+                  },
+                  child: Text("Add"),
+                )
+              ],
+            ));
   }
 }
