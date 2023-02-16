@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/main_nav.dart';
 
-void main() {
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -12,11 +14,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
+      theme: ThemeData.dark(
         useMaterial3: true
       ),
-      home: const HomePage(),
+      home: const MainPage(),
     );
   }
 }

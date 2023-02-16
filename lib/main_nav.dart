@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/Screens/checked_tasks.dart';
+import 'package:todo_app/Screens/pending_tasks.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class MainPage extends StatefulWidget {
+  const MainPage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MainPageState extends State<MainPage> {
+
   int currentIndex = 0;
-  List pages = [];
+  List pages = const [PendingTasks(), CheckedTasks()];
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +20,11 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("ToDo"),
       ),
+      body: pages[currentIndex],
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          _addTask();
+        },
         child: const Icon(Icons.add_task),
       ),
       bottomNavigationBar: NavigationBar(
@@ -36,5 +42,26 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  _addTask() {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          icon: Icon(Icons.add_task),
+          title: Text("Add Task"),
+          content: TextField(
+            decoration: InputDecoration(
+              hintText: "Name of task",
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))
+            ),
+          ),
+          actions: [
+            MaterialButton(
+              onPressed: () {},
+              child: Text("Add"),
+            )
+          ],
+        ));
   }
 }
