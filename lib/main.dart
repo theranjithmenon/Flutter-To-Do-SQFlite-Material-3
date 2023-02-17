@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app/main_nav.dart';
+import 'home_page.dart';
 
 
 Future<void> main() async {
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark(
         useMaterial3: true
       ),
-      home: const MainPage(),
+      home: const HomePage(),
     );
   }
 }
