@@ -32,9 +32,9 @@ class SQLHelper {
     return db.query('items', orderBy: "id");
   }
 
-  static Future<List<Map<String, dynamic>>> getItem(int id) async {
+  static Future<List<Map<String, dynamic>>> getItem(int isDone) async {
     final db = await SQLHelper.db();
-    return db.query('items', where: "isDone = 1", whereArgs: [id], limit: 1);
+    return db.query('items', where: "isDone = $isDone");
   }
 
   static Future<int> updateItem(int id, String title, int isDone) async {

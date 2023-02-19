@@ -9,92 +9,78 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Map<String, dynamic>> _journals = [];
+  int currentIndex = 0;
+
+  List<Map<String, dynamic>> _pendingTasks = [];
+  List<Map<String, dynamic>> _completedTasks = [];
   final TextEditingController _title = TextEditingController();
 
   Future<void> _addItem() async {
     await SQLHelper.createItem(_title.text, 0);
-    _refreshJournels();
+    _refreshData();
   }
 
   Future<void> _updateItem(int id, String title) async {
-    // await SQLHelper.updateItem(id, _journals[id]["title"], 1);
     await SQLHelper.updateItem(id, title, 1);
-    _refreshJournels();
+    _refreshData();
   }
 
   void _deleteItem(int id) async {
     await SQLHelper.deleteItem(id);
-    _refreshJournels();
+    _refreshData();
   }
 
-  void _refreshJournels() async {
-    final data = await SQLHelper.getItems();
+  void _refreshData() async {
+    final dataPending = await SQLHelper.getItem(0);
+    final dataCompleated = await SQLHelper.getItem(1);
     setState(() {
-      _journals = data;
+      _pendingTasks = dataPending;
+      _completedTasks = dataCompleated;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _refreshJournels();
+    _refreshData();
   }
 
   @override
   Widget build(BuildContext context) {
+    List pages = [_pendingList(), _compleatedList()];
     return Scaffold(
       appBar: AppBar(
-        title: Text("ToDo"),
+        title: (currentIndex == 0)
+            ? Text("Pending Tasks")
+            : Text("Completed Tasks"),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15),
-            child: Visibility(
-              visible: (_journals.length == 0) ? false : true,
-              child: CircleAvatar(
-                child: Text("${_journals.length}"),
-              ),
-            ),
-          )
+          IconButton(
+              onPressed: () {
+                _showForm();
+              },
+              icon: Icon(Icons.add_task))
         ],
       ),
-      body: (_journals.length == 0)
-          ? Center(child: Text("Add Tasks"))
-          : ListView.builder(
-              itemCount: _journals.length,
-              itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      child: ListTile(
-                        leading: IconButton(
-                            onPressed: () {
-                              _deleteItem(_journals[index]["id"]);
-                            },
-                            icon: Icon(Icons.delete)),
-                        title: Text(_journals[index]["title"]),
-                        trailing: IconButton(
-                            onPressed: () {
-                              _updateItem(_journals[index]["id"],
-                                  _journals[index]["title"]);
-                            },
-                            icon: (_journals[index]["isDone"] == 0)
-                                ? Icon(
-                                    Icons.done,
-                                    color: Colors.redAccent,
-                                  )
-                                : Icon(
-                                    Icons.done_all,
-                                    color: Colors.blueAccent,
-                                  )),
-                      ),
-                    ),
-                  )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showForm();
-        },
-        child: Icon(Icons.add_task),
-      ),
+      body: pages[currentIndex],
+      bottomNavigationBar: NavigationBar(
+          selectedIndex: currentIndex,
+          onDestinationSelected: (value) {
+            setState(() {
+              currentIndex = value;
+            });
+          },
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.timer_outlined),
+              label: "Pending",
+              selectedIcon: Icon(Icons.timer),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.task_alt_outlined),
+              label: "Completed",
+              selectedIcon: Icon(Icons.task_alt),
+            ),
+          ]),
     );
   }
 
@@ -122,5 +108,59 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ));
+  }
+
+  _pendingList() {
+    return (_pendingTasks.length == 0)
+        ? Center(child: Text("Add Tasks"))
+        : ListView.builder(
+            itemCount: _pendingTasks.length,
+            itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    child: ListTile(
+                      leading: IconButton(
+                          onPressed: () {
+                            _deleteItem(_pendingTasks[index]["id"]);
+                          },
+                          icon: Icon(Icons.delete)),
+                      title: Text(_pendingTasks[index]["title"]),
+                      trailing: IconButton(
+                          onPressed: () {
+                            _updateItem(_pendingTasks[index]["id"],
+                                _pendingTasks[index]["title"]);
+                          },
+                          icon: (_pendingTasks[index]["isDone"] == 0)
+                              ? Icon(
+                                  Icons.done,
+                                  color: Colors.redAccent,
+                                )
+                              : Icon(
+                                  Icons.done_all,
+                                  color: Colors.blueAccent,
+                                )),
+                    ),
+                  ),
+                ));
+  }
+
+  _compleatedList() {
+    return (_completedTasks.length == 0)
+        ? Center(child: Text("All tasks Compleated"))
+        : ListView.builder(
+            itemCount: _completedTasks.length,
+            itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    child: ListTile(
+                      leading: IconButton(
+                          onPressed: () {
+                            _deleteItem(_completedTasks[index]["id"]);
+                          },
+                          icon: Icon(Icons.delete)),
+                      title: Text(_completedTasks[index]["title"]),
+                    ),
+                  ),
+                ));
   }
 }
