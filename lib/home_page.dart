@@ -10,7 +10,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> _journals = [];
-  bool _isLoading = true;
   final TextEditingController _title = TextEditingController();
 
   Future<void> _addItem() async {
@@ -18,12 +17,13 @@ class _HomePageState extends State<HomePage> {
     _refreshJournels();
   }
 
-  Future<void> _updateItem(int id) async {
-    await SQLHelper.updateItem(id, _journals[id]["title"], 1);
+  Future<void> _updateItem(int id, String title) async {
+    // await SQLHelper.updateItem(id, _journals[id]["title"], 1);
+    await SQLHelper.updateItem(id, title, 1);
     _refreshJournels();
   }
 
-  void _deleteItem(int id) async{
+  void _deleteItem(int id) async {
     await SQLHelper.deleteItem(id);
     _refreshJournels();
   }
@@ -32,7 +32,6 @@ class _HomePageState extends State<HomePage> {
     final data = await SQLHelper.getItems();
     setState(() {
       _journals = data;
-      _isLoading = false;
     });
   }
 
@@ -50,8 +49,11 @@ class _HomePageState extends State<HomePage> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 15),
-            child: CircleAvatar(
-              child: Text("${_journals.length}"),
+            child: Visibility(
+              visible: (_journals.length == 0) ? false : true,
+              child: CircleAvatar(
+                child: Text("${_journals.length}"),
+              ),
             ),
           )
         ],
@@ -64,13 +66,16 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
                       child: ListTile(
-                        leading: IconButton(onPressed: (){
-                          _deleteItem(_journals[index]["id"]);
-                        }, icon: Icon(Icons.delete)),
+                        leading: IconButton(
+                            onPressed: () {
+                              _deleteItem(_journals[index]["id"]);
+                            },
+                            icon: Icon(Icons.delete)),
                         title: Text(_journals[index]["title"]),
                         trailing: IconButton(
                             onPressed: () {
-                              _updateItem(index);
+                              _updateItem(_journals[index]["id"],
+                                  _journals[index]["title"]);
                             },
                             icon: (_journals[index]["isDone"] == 0)
                                 ? Icon(
