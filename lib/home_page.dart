@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todo_app/sql_helper.dart';
 
 class HomePage extends StatefulWidget {
@@ -50,9 +51,7 @@ class _HomePageState extends State<HomePage> {
     List pages = [_pendingList(), _compleatedList()];
     return Scaffold(
       appBar: AppBar(
-        title: (currentIndex == 0)
-            ? Text("Pending Tasks")
-            : Text("Completed Tasks"),
+        title: const Text("ToDo"),
         actions: [
           IconButton(
               onPressed: () {
@@ -99,7 +98,10 @@ class _HomePageState extends State<HomePage> {
               ),
               actions: [
                 MaterialButton(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   onPressed: () async {
+                    if(_title.text == "")
+                      return;
                     await _addItem();
                     _title.text = "";
                     Navigator.of(context).pop();
@@ -117,28 +119,43 @@ class _HomePageState extends State<HomePage> {
             itemCount: _pendingTasks.length,
             itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Card(
-                    child: ListTile(
-                      leading: IconButton(
-                          onPressed: () {
-                            _deleteItem(_pendingTasks[index]["id"]);
-                          },
-                          icon: Icon(Icons.delete)),
-                      title: Text(_pendingTasks[index]["title"]),
-                      trailing: IconButton(
-                          onPressed: () {
-                            _updateItem(_pendingTasks[index]["id"],
-                                _pendingTasks[index]["title"]);
-                          },
-                          icon: (_pendingTasks[index]["isDone"] == 0)
-                              ? Icon(
-                                  Icons.done,
-                                  color: Colors.redAccent,
-                                )
-                              : Icon(
-                                  Icons.done_all,
-                                  color: Colors.blueAccent,
-                                )),
+                  child: Slidable(
+                    startActionPane:
+                        ActionPane(motion: const ScrollMotion(), children: [
+                      SlidableAction(
+                        autoClose: true,
+                        borderRadius: BorderRadius.circular(25),
+                        onPressed: (context) {
+                          _deleteItem(_pendingTasks[index]["id"]);
+                        },
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: 'Delete',
+                      )
+                    ]),
+                    endActionPane:
+                        ActionPane(motion: const ScrollMotion(), children: [
+                      SlidableAction(
+                        autoClose: true,
+                        borderRadius: BorderRadius.circular(25),
+                        onPressed: (context) {
+                          _updateItem(_pendingTasks[index]["id"],
+                              _pendingTasks[index]["title"]);
+                        },
+                        backgroundColor: Colors.blueAccent,
+                        foregroundColor: Colors.white,
+                        icon: Icons.done,
+                        label: "Done",
+                      )
+                    ]),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          title: Text(_pendingTasks[index]["title"]),
+                        ),
+                      ),
                     ),
                   ),
                 ));
@@ -151,14 +168,25 @@ class _HomePageState extends State<HomePage> {
             itemCount: _completedTasks.length,
             itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Card(
-                    child: ListTile(
-                      leading: IconButton(
-                          onPressed: () {
-                            _deleteItem(_completedTasks[index]["id"]);
-                          },
-                          icon: Icon(Icons.delete)),
-                      title: Text(_completedTasks[index]["title"]),
+                  child: Slidable(
+                    startActionPane:
+                        ActionPane(motion: const ScrollMotion(), children: [
+                      SlidableAction(
+                        autoClose: true,
+                        borderRadius: BorderRadius.circular(25),
+                        onPressed: (context) {
+                          _deleteItem(_completedTasks[index]["id"]);
+                        },
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: 'Delete',
+                      )
+                    ]),
+                    child: Card(
+                      child: ListTile(
+                        title: Text(_completedTasks[index]["title"]),
+                      ),
                     ),
                   ),
                 ));
