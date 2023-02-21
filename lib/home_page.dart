@@ -33,10 +33,10 @@ class _HomePageState extends State<HomePage> {
 
   void _refreshData() async {
     final dataPending = await SQLHelper.getItem(0);
-    final dataCompleated = await SQLHelper.getItem(1);
+    final dataCompleted = await SQLHelper.getItem(1);
     setState(() {
       _pendingTasks = dataPending;
-      _completedTasks = dataCompleated;
+      _completedTasks = dataCompleted;
     });
   }
 
